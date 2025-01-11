@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+    <h1>Fake News Detector</h1>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" cols="50" placeholder="Enter news content..."></textarea><br>
+        <input type="text" name = "source" placeholder ="Enter news source..."><br>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if result %}
+        <h2>Sentiment Analysis Result:</h2>
+        <p class = "note">We use sentiment analysis because more often than not, fake news often uses emotional, sensational or exaggerated language in order to get attention and influence people.</p>
+        <p class = "note"> If an article is overwhelmingly negative or positive, it may be a sign on manipulation, which is often a sign of fake or misleading news.</p>
+        <p>Fake: {{result.fake}} </p>
+        <p>Confidence : {{result.confidence}} </p>
+        <p>Sentiment: {{ result.sentiment }}</p>
+        <h3>Source Statistics:</h3>
+        <ul>
+            <li>Positive: {{ result.source_stats.positive }}</li>
+            <li>Neutral: {{ result.source_stats.neutral }}</li>
+            <li>Negative: {{ result.source_stats.negative }}</li>
+        </ul>
+        <h2>Statistics Plot:</h2>
+        <p class = "note">Here you can see the past results of analysis of the same source you have provided. Thus, you can draw more detailed conclusions.</p> 
+        <img src="{% static 'images/' %}image{{ result.source }}_stats.png" alt="Statistics Plot">
+         
+
+        <h2>Google Search Results Similar to Your News:</h2>
+        <p class = "note">It is alwasy better to check more than one source. Here are some that concern your topic.</p>
+        <ul>
+            {% for title, link, domain in result.search_results %}
+                <li>
+                    <a href="{{ link }}" target="_blank">{{ title }}</a> 
+                    - <span>{{ domain }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        
+    {% endif %}
+
+ </body>
+ </html>
